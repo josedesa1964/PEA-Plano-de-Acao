@@ -821,19 +821,47 @@ async function persist(){
       try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }catch(e){}
       if(SYNC_ENABLED){
         try{
-          await fetch(API_URL, {
+          const res = await fetch(API_URL, {
             method:'POST',
             headers:{ 'Content-Type':'text/plain;charset=utf-8' }, // evita preflight CORS no Apps Script
             body: JSON.stringify({ action:'save', items })
           });
+          const data = await res.json();
+          if(data && Array.isArray(data.items)){
+            // O servidor respondeu com uma lista de itens em vez de confirmar o salvamento —
+            // isso indica que o POST não chegou no backend (provável redirecionamento do Google).
+            showSyncError('O salvamento não foi confirmado pelo servidor (o pedido pode ter sido redirecionado). Tente novamente ou revise a implantação do Apps Script.');
+          } else if(!data || data.ok !== true){
+            showSyncError('O servidor recusou o salvamento: ' + (data && data.error ? data.error : 'erro desconhecido'));
+          } else {
+            hideSyncError();
+          }
         }catch(e){
           console.error('Não foi possível sincronizar com o servidor.', e);
+          showSyncError('Não foi possível conectar ao servidor. As edições ficaram salvas só neste navegador por enquanto.');
         }
       }
       setSaveState(false);
       resolve();
     }, 500);
   });
+}
+
+function showSyncError(msg){
+  let banner = document.getElementById('syncErrorBanner');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = 'syncErrorBanner';
+    banner.style.cssText = 'background:#F7E4DF;color:#8A2F1C;border:1px solid #E0AFA1;border-radius:4px;padding:10px 16px;margin:0 clamp(16px,4vw,48px) 0;font-size:13px;position:sticky;top:0;z-index:30;';
+    document.querySelector('.filters-wrap').insertAdjacentElement('beforebegin', banner);
+  }
+  banner.textContent = '⚠ ' + msg;
+  banner.style.display = 'block';
+}
+
+function hideSyncError(){
+  const banner = document.getElementById('syncErrorBanner');
+  if(banner) banner.style.display = 'none';
 }
 
 async function refreshFromServer(){
