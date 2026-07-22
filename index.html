@@ -3,600 +3,1180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Metas e Bônus — Grupo HSA</title>
-<link rel="stylesheet" href="../assets/style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Painel de Ação · PEA 2026</title>
 <style>
-  .mb-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 22px;
+  :root{
+    --ink:#0F2038;
+    --ink-2:#16304F;
+    --paper:#F1EEE5;
+    --paper-2:#FFFFFF;
+    --line:#DAD4C4;
+    --slate:#2A3542;
+    --slate-soft:#66707C;
+    --brass:#B9862F;
+    --brass-soft:#E4C98C;
+    --st-pendente:#8B93A0;
+    --st-iniciado:#2F6FA8;
+    --st-finalizado:#3E8F61;
+    --st-atrasado:#BF4A32;
   }
-  .mb-select-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--branco);
-    border: 1px solid var(--cinza-borda);
-    border-radius: 10px;
-    padding: 8px 14px;
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--slate);
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing:antialiased;
   }
-  .mb-select-wrap label {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--texto-suave);
-  }
-  .mb-select-wrap select {
-    border: none;
-    background: var(--azul-claro);
-    color: #fff;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  .mb-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-  .mb-card {
-    background: var(--branco);
-    border: 1px solid var(--cinza-borda);
-    border-radius: 14px;
-    padding: 18px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    border-left: 6px solid var(--cinza-borda);
-  }
-  .mb-card.status-verde { border-left-color: var(--verde); }
-  .mb-card.status-amarelo { border-left-color: #f4b400; }
-  .mb-card.status-vermelho { border-left-color: var(--vermelho); }
-  .mb-card.status-cinza { border-left-color: #b7bfc9; }
+  ::selection{background:var(--brass-soft);}
 
-  .mb-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 10px;
+  /* ---------- HEADER ---------- */
+  header.board{
+    background:linear-gradient(160deg, var(--ink) 0%, var(--ink-2) 100%);
+    color:#F1EEE5;
+    padding:28px clamp(16px,4vw,48px) 22px;
+    position:relative;
+    overflow:hidden;
   }
-  .mb-card h3 {
-    margin: 0;
-    font-size: 14.5px;
-    color: var(--azul-escuro);
-    line-height: 1.3;
+  header.board::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image:repeating-linear-gradient(90deg, rgba(241,238,229,.045) 0 1px, transparent 1px 64px);
+    pointer-events:none;
   }
-  .mb-badge {
-    font-size: 11px;
-    font-weight: 800;
-    padding: 4px 9px;
-    border-radius: 20px;
-    white-space: nowrap;
+  .board-top{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap;
+    position:relative; z-index:1;
   }
-  .mb-badge.status-verde { background: #e5f8ee; color: #1e8a4c; }
-  .mb-badge.status-amarelo { background: #fff4dc; color: #a8760a; }
-  .mb-badge.status-vermelho { background: #fdeaea; color: #c0392b; }
-  .mb-badge.status-cinza { background: #eef0f3; color: #7c8492; }
+  .eyebrow{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif;
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--brass-soft); margin:0 0 8px;
+  }
+  h1{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-weight:600; font-size:clamp(26px,3.4vw,38px);
+    margin:0; line-height:1.05;
+  }
+  .subtitle{ color:#C7CEDA; font-size:14px; margin-top:6px; max-width:520px;}
+  .save-indicator{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:11.5px; color:#9FB2C9;
+    display:flex; align-items:center; gap:7px;
+  }
+  .save-dot{width:7px;height:7px;border-radius:50%;background:var(--st-finalizado); transition:background .2s;}
+  .save-dot.saving{background:var(--brass-soft);}
 
-  .mb-pct {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--azul-escuro);
-    line-height: 1;
-    margin-bottom: 6px;
+  .gauge-row{
+    display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; position:relative; z-index:1;
   }
-  .mb-bar-track {
-    height: 8px;
-    border-radius: 6px;
-    background: #eceff3;
-    overflow: hidden;
-    margin-bottom: 12px;
+  .gauge{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:3px;
+    padding:10px 16px;
+    min-width:112px;
+    cursor:pointer;
+    user-select:none;
+    transition:background .15s, border-color .15s, transform .1s;
   }
-  .mb-bar-fill {
-    height: 100%;
-    border-radius: 6px;
-    transition: width 0.3s ease;
+  .gauge:hover{ background:rgba(255,255,255,.09); }
+  .gauge:active{ transform:scale(.97); }
+  .gauge.active{
+    background:rgba(255,255,255,.14);
+    border-color:var(--brass-soft);
+    box-shadow:0 0 0 1px rgba(228,201,140,.35) inset;
   }
-  .mb-bar-fill.status-verde { background: var(--verde); }
-  .mb-bar-fill.status-amarelo { background: #f4b400; }
-  .mb-bar-fill.status-vermelho { background: var(--vermelho); }
-  .mb-bar-fill.status-cinza { background: #c7ccd3; }
+  .gauge .num{font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:24px; font-weight:600; line-height:1;}
+  .gauge .lbl{font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:#AEB8C6; margin-top:5px;}
+  .gauge.pendente .num{color:var(--st-pendente);}
+  .gauge.iniciado .num{color:#7EB2E0;}
+  .gauge.finalizado .num{color:#7FCB9C;}
+  .gauge.atrasado .num{color:#E28870;}
+  .gauge.total .num{color:var(--brass-soft);}
 
-  .mb-meta-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12.5px;
-    color: var(--texto-suave);
-    padding-top: 8px;
-    border-top: 1px solid var(--cinza-borda);
+  /* progress overview bar */
+  .overview-bar{
+    display:flex; height:9px; border-radius:5px; overflow:hidden; margin-top:16px;
+    border:1px solid rgba(255,255,255,.12); position:relative; z-index:1; max-width:640px;
   }
-  .mb-meta-row b { color: var(--texto); }
+  .overview-bar span{height:100%; display:block; cursor:pointer; transition:filter .15s;}
+  .overview-bar span:hover{filter:brightness(1.25);}
 
-  .mb-chart-card {
-    background: var(--branco);
-    border: 1px solid var(--cinza-borda);
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 26px;
+  .general-progress{
+    margin-top:20px; max-width:640px; position:relative; z-index:1;
   }
-  .mb-chart-card h3 {
-    margin: 0 0 14px;
-    font-size: 15px;
-    color: var(--azul-escuro);
+  .general-progress .gp-head{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;
   }
-  .mb-chart-wrap { position: relative; height: 320px; }
+  .general-progress .gp-lbl{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
+    color:#AEB8C6;
+  }
+  .general-progress .gp-pct{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-weight:600; font-size:20px; color:var(--brass-soft);
+  }
+  .general-progress .gp-track{
+    height:14px; border-radius:8px; background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14); overflow:hidden;
+  }
+  .general-progress .gp-fill{
+    height:100%; border-radius:8px 0 0 8px;
+    background:linear-gradient(90deg, var(--brass) 0%, var(--brass-soft) 100%);
+    transition:width .3s ease;
+  }
 
-  .mb-note {
-    background: #eef4fb;
-    border: 1px solid #cfe1f3;
-    color: #2c4a68;
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 13px;
-    line-height: 1.6;
-    margin-bottom: 26px;
+  /* ---------- FILTERS ---------- */
+  .filters-wrap{
+    padding:16px clamp(16px,4vw,48px);
+    position:sticky; top:0; z-index:20;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
   }
-  .mb-note b { color: var(--azul-escuro); }
+  .filters{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:12px 14px;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  }
+  .filters .search{
+    flex:1 1 200px; position:relative;
+  }
+  .filters input[type="text"]{
+    width:100%; padding:8px 10px 8px 30px; border:1px solid var(--line); border-radius:3px;
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:13.5px; background:var(--paper); color:var(--slate);
+  }
+  .filters .search::before{
+    content:"⌕"; position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    color:var(--slate-soft); font-size:15px; pointer-events:none;
+  }
+  .filters select{
+    padding:8px 10px; border:1px solid var(--line); border-radius:3px; background:var(--paper-2);
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:13px; color:var(--slate); cursor:pointer;
+  }
+  .filters .clear-btn{
+    padding:8px 12px; border:1px solid var(--line); border-radius:3px; background:transparent;
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:11.5px; letter-spacing:.04em; color:var(--slate-soft);
+    cursor:pointer; text-transform:uppercase;
+  }
+  .filters .clear-btn:hover{ color:var(--st-atrasado); border-color:var(--st-atrasado);}
+  .result-count{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:11.5px; color:var(--slate-soft); padding:8px 4px 0;
+  }
 
-  .mb-totalbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--azul-escuro);
-    color: #fff;
-    border-radius: 12px;
-    padding: 16px 22px;
-    margin-bottom: 26px;
-    flex-wrap: wrap;
-    gap: 12px;
+  /* ---------- CARDS ---------- */
+  main{padding:22px clamp(16px,4vw,48px) 80px; max-width:1180px; margin:0 auto;}
+  .card{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-left:5px solid var(--st-pendente);
+    border-radius:4px;
+    margin-bottom:16px;
+    padding:18px 20px;
+    transition:box-shadow .15s;
   }
-  .mb-totalbar .label { font-size: 12px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.4px; }
-  .mb-totalbar .value { font-size: 26px; font-weight: 800; }
-  .mb-totalbar .block { text-align: center; }
+  .card:hover{ box-shadow:0 3px 14px rgba(15,32,56,.07); }
+  .card.st-INICIADO{border-left-color:var(--st-iniciado);}
+  .card.st-FINALIZADO{border-left-color:var(--st-finalizado);}
+  .card.st-ATRASADO{border-left-color:var(--st-atrasado);}
+  .card.st-PENDENTE{border-left-color:var(--st-pendente);}
 
-  .mb-toggle {
-    display: block;
-    margin-top: 10px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--azul-claro);
-    cursor: pointer;
-    user-select: none;
+  .card-head{
+    display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; align-items:flex-start;
   }
-  .mb-toggle:hover { text-decoration: underline; }
+  .tags{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:6px;}
+  .tag{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:10.5px; letter-spacing:.04em;
+    padding:2px 7px; border-radius:2px; text-transform:uppercase; white-space:nowrap;
+  }
+  .tag.num{background:var(--ink); color:var(--brass-soft);}
+  .tag.setor{background:#E7E2D3; color:var(--slate);}
+  .tag.swot-Fraquezas{background:#F2DCC9; color:#8A4A18;}
+  .tag.swot-Ameaças{background:#F3D3CE; color:#9A3121;}
+  .tag.swot-Forças{background:#D6EBDA; color:#276A3F;}
+  .tag.swot-Oportunidades{background:#D6E5F2; color:#245683;}
+  .tag.ano{background:transparent; color:var(--slate-soft); border:1px solid var(--line);}
 
-  .mb-detail {
-    grid-column: 1 / -1;
-    background: var(--branco);
-    border: 1px solid var(--cinza-borda);
-    border-radius: 12px;
-    padding: 4px 4px 10px;
-    margin-top: -6px;
-  }
-  .mb-detail table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12.5px;
-  }
-  .mb-detail th, .mb-detail td {
-    padding: 9px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--cinza-borda);
-  }
-  .mb-detail th {
-    color: var(--texto-suave);
-    text-transform: uppercase;
-    font-size: 10.5px;
-    letter-spacing: 0.4px;
-    font-weight: 700;
-  }
-  .mb-detail tr:last-child td { border-bottom: none; }
-  .mb-detail td.num, .mb-detail th.num { text-align: right; white-space: nowrap; }
-  .mb-mini-badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: 12px;
-    white-space: nowrap;
-  }
-  .mb-mini-badge.status-verde { background: #e5f8ee; color: #1e8a4c; }
-  .mb-mini-badge.status-amarelo { background: #fff4dc; color: #a8760a; }
-  .mb-mini-badge.status-vermelho { background: #fdeaea; color: #c0392b; }
-  .mb-mini-badge.status-cinza { background: #eef0f3; color: #7c8492; }
-  .mb-mini-bar-track {
-    width: 90px;
-    height: 6px;
-    border-radius: 4px;
-    background: #eceff3;
-    overflow: hidden;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-  .mb-mini-bar-fill { height: 100%; border-radius: 4px; }
-  .mb-mini-bar-fill.status-verde { background: var(--verde); }
-  .mb-mini-bar-fill.status-amarelo { background: #f4b400; }
-  .mb-mini-bar-fill.status-vermelho { background: var(--vermelho); }
-  .mb-mini-bar-fill.status-cinza { background: #c7ccd3; }
+  .title-block{flex:1 1 320px;}
+  .melhoria{font-size:12px; color:var(--slate-soft); margin:0 0 3px;}
+  .acao{font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-weight:600; font-size:17px; margin:0; line-height:1.3; color:var(--ink);}
 
-  .mb-info-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--azul-claro);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    font-style: italic;
-    font-family: Georgia, "Times New Roman", serif;
-    cursor: pointer;
-    margin-left: 6px;
-    position: relative;
-    vertical-align: middle;
-    user-select: none;
+  .meta-right{display:flex; flex-direction:column; gap:6px; align-items:flex-end; min-width:190px;}
+  .responsavel{
+    font-size:12.5px; font-weight:500; display:flex; align-items:center; gap:6px;
   }
-  .mb-info-icon:hover { background: var(--azul-escuro); }
-  .mb-info-tip {
-    display: none;
-    position: absolute;
-    z-index: 60;
-    top: 22px;
-    left: 0;
-    background: #1c2530;
-    color: #fff;
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 400;
-    font-style: normal;
-    font-family: "Segoe UI", Arial, sans-serif;
-    line-height: 1.5;
-    width: 260px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-    white-space: normal;
-    text-align: left;
+  .avatar{
+    width:20px;height:20px;border-radius:50%; background:var(--ink); color:#F1EEE5;
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:9.5px; display:flex; align-items:center; justify-content:center;
+    font-weight:600;
   }
-  .mb-info-icon.open .mb-info-tip { display: block; }
+  .prazo{font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:11.5px; color:var(--slate-soft);}
+  .prazo.overdue{color:var(--st-atrasado); font-weight:600;}
+
+  .card-body{
+    margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:16px 24px;
+  }
+  @media (max-width:720px){ .card-body{grid-template-columns:1fr;} }
+
+  .field-lbl{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--slate-soft); margin:0 0 4px;
+  }
+  .field-txt{font-size:13px; line-height:1.5; color:var(--slate); margin:0; white-space:pre-line;}
+  .field-txt.empty{color:#B8B2A2; font-style:italic;}
+
+  .status-row{
+    display:flex; align-items:center; gap:12px; margin-top:14px; flex-wrap:wrap;
+  }
+  select.status-select{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:11.5px; letter-spacing:.03em; text-transform:uppercase;
+    padding:6px 10px; border-radius:3px; border:1px solid var(--line); cursor:pointer; font-weight:600;
+  }
+  select.status-select.st-PENDENTE{background:#EEEEF0; color:var(--st-pendente);}
+  select.status-select.st-INICIADO{background:#E4EEF7; color:var(--st-iniciado);}
+  select.status-select.st-FINALIZADO{background:#E1F1E7; color:var(--st-finalizado);}
+  select.status-select.st-ATRASADO{background:#F7E4DF; color:var(--st-atrasado);}
+
+  .card-progress{ margin-top:14px; }
+  .cp-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .cp-lbl{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--slate-soft);
+  }
+  .progress-pct{font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-weight:600; font-size:15px; color:var(--brass); min-width:34px; text-align:right;}
+  .progress-track{
+    position:relative; height:11px; border-radius:6px; background:#EAE5D8; overflow:visible;
+    border:1px solid var(--line);
+  }
+  .progress-fill{
+    height:100%; border-radius:5px;
+    background:linear-gradient(90deg,var(--brass) 0%, var(--brass-soft) 100%);
+    pointer-events:none; transition:width .2s ease;
+  }
+  input[type="range"].progress-slider{
+    -webkit-appearance:none; appearance:none; position:absolute; top:50%; left:0; width:100%;
+    height:20px; margin:0; background:transparent; transform:translateY(-50%); cursor:pointer;
+  }
+  input[type="range"].progress-slider::-webkit-slider-runnable-track{ background:transparent; height:20px; }
+  input[type="range"].progress-slider::-moz-range-track{ background:transparent; height:20px; }
+  input[type="range"].progress-slider::-webkit-slider-thumb{
+    -webkit-appearance:none; width:17px; height:17px; border-radius:50%; background:var(--brass);
+    border:2.5px solid #fff; box-shadow:0 1px 4px rgba(15,32,56,.35); margin-top:0; cursor:grab;
+  }
+  input[type="range"].progress-slider::-moz-range-thumb{
+    width:17px; height:17px; border-radius:50%; background:var(--brass); border:2.5px solid #fff;
+    box-shadow:0 1px 4px rgba(15,32,56,.35); cursor:grab;
+  }
+
+  /* PLANO log */
+  .plano-block{margin-top:16px; border-top:1px dashed var(--line); padding-top:12px;}
+  .plano-log{list-style:none; margin:0 0 10px; padding:0; display:flex; flex-direction:column; gap:6px;}
+  .plano-log li{
+    font-size:12.5px; line-height:1.5; padding:6px 10px; background:var(--paper);
+    border-left:2px solid var(--brass-soft); border-radius:0 3px 3px 0; color:var(--slate);
+  }
+  .plano-log li .del-entry{
+    float:right; cursor:pointer; color:var(--slate-soft); font-size:11px; margin-left:8px;
+  }
+  .plano-log li .del-entry:hover{color:var(--st-atrasado);}
+  .plano-empty{font-size:12px; color:#B8B2A2; font-style:italic; margin-bottom:10px;}
+  .plano-add{display:flex; gap:8px;}
+  .plano-add textarea{
+    flex:1; resize:vertical; min-height:36px; max-height:120px; padding:8px 10px;
+    border:1px solid var(--line); border-radius:3px; font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:12.5px;
+    background:var(--paper-2);
+  }
+  .plano-add button{
+    font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:.04em;
+    background:var(--ink); color:var(--brass-soft); border:none; border-radius:3px; padding:0 16px;
+    cursor:pointer; white-space:nowrap;
+  }
+  .plano-add button:hover{background:var(--ink-2);}
+
+  .empty-state{
+    text-align:center; padding:60px 20px; color:var(--slate-soft);
+  }
+  .empty-state .big{font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:20px; color:var(--slate); margin-bottom:6px;}
+
+  footer{
+    text-align:center; padding:18px; font-family:'Segoe UI', Arial, Helvetica, sans-serif; font-size:10.5px;
+    color:var(--slate-soft); border-top:1px solid var(--line);
+  }
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="brand">
-    Grupo HSA — Painel de Metas e Bônus
+<header class="board">
+  <div class="board-top">
+    <div>
+      <p class="eyebrow">Planejamento Estratégico &middot; Ciclo 2026</p>
+      <h1>Painel de Ação PEA</h1>
+      <p class="subtitle">Acompanhamento vivo das ações derivadas da matriz SWOT — atualize status, progresso e evolução de cada frente diretamente aqui.</p>
+    </div>
+    <div class="save-indicator" style="flex-direction:column; align-items:flex-end; gap:4px;">
+      <span style="display:flex; align-items:center; gap:7px;"><span class="save-dot" id="saveDot"></span><span id="saveText">tudo salvo</span></span>
+      <span id="syncBadge" style="font-size:10.5px; color:#8C9BAE;"></span>
+    </div>
+
+  <div class="gauge-row" id="gaugeRow"></div>
+  <div class="overview-bar" id="overviewBar"></div>
+  <div class="general-progress">
+    <div class="gp-head">
+      <span class="gp-lbl">Progresso geral do plano</span>
+      <span class="gp-pct" id="gpPct">0%</span>
+    </div>
+    <div class="gp-track"><div class="gp-fill" id="gpFill" style="width:0%"></div></div>
   </div>
-  <div class="topbar-meta"><a href="../index.html" style="color:#cfd9e8;text-decoration:none;">← voltar para a Central de KPIs</a></div>
 </header>
 
-<main>
-
-  <div class="mb-header">
-    <div>
-      <h1 style="margin:0 0 4px;font-size:24px;color:var(--azul-escuro);">Metas 2026 — visão por área</h1>
-      <p style="margin:0;color:var(--texto-suave);font-size:13.5px;">Dados extraídos da planilha KPI 26 (aba de metas e bônus).</p>
+<div class="filters-wrap">
+  <div class="filters">
+    <div class="search">
+      <input type="text" id="fSearch" placeholder="Buscar por ação, objetivo, melhoria…">
     </div>
-    <div class="mb-select-wrap">
-      <label for="mesSelect">Período</label>
-      <select id="mesSelect"></select>
-    </div>
+    <select id="fSetor"><option value="">Setor · todos</option></select>
+    <select id="fResp"><option value="">Responsável · todos</option></select>
+    <select id="fStatus"><option value="">Status · todos</option></select>
+    <select id="fSwot"><option value="">SWOT · todos</option></select>
+    <select id="fAno"><option value="">Ano · todos</option></select>
+    <select id="fSort">
+      <option value="prazo">Ordenar: prazo</option>
+      <option value="status">Ordenar: status</option>
+      <option value="setor">Ordenar: setor</option>
+      <option value="responsavel">Ordenar: responsável</option>
+      <option value="andamento">Ordenar: progresso</option>
+    </select>
+    <button class="clear-btn" id="clearFilters">Limpar filtros</button>
   </div>
+  <div class="result-count" id="resultCount"></div>
+</div>
 
-  <div class="mb-totalbar">
-    <div class="block">
-      <div class="label">Áreas monitoradas</div>
-      <div class="value" id="totAreas">–</div>
-    </div>
-    <div class="block">
-      <div class="label">% Atingimento médio (empresa)</div>
-      <div class="value" id="totPct">–</div>
-    </div>
-    <div class="block">
-      <div class="label">% Bônus conquistado (médio)</div>
-      <div class="value" id="totBonus">–</div>
-    </div>
-  </div>
+<main id="cardsContainer"></main>
 
-  <div class="mb-note">
-    <b>Como ler:</b> % Atingimento = resultado do período ÷ meta de cada indicador, ponderado pelo peso de cada indicador dentro da área.
-    Ao escolher um trimestre ou semestre, o resultado é a <b>média dos meses do período</b> que já têm valor lançado.
-    Indicadores marcados como <b>"(máx.)"</b> são de teto (ex.: Cobrança) — ficar abaixo da meta é o desempenho desejado, e o % Atingimento já é calculado de forma invertida para refletir isso.
-    Indicadores como <b>Leads</b> (nas áreas de Operação) têm meta definida por trimestre: o resultado do período é a <b>soma</b> dos meses (não a média), e a meta se ajusta proporcionalmente ao período escolhido (mês, trimestre ou semestre).
-    Indicadores sem nenhum resultado lançado no período não entram na conta.
-  </div>
-
-  <div class="mb-cards" id="cardsWrap"></div>
-
-  <div class="mb-chart-card">
-    <h3 id="chartTitle">% Atingimento por área</h3>
-    <div class="mb-chart-wrap"><canvas id="chartAreas"></canvas></div>
-  </div>
-
-</main>
-
-<footer class="footer">
-  Grupo HSA — Central de KPIs interna · Fonte: planilha KPI 26 (atualize e reenvie para refletir aqui)
-</footer>
+<footer>PEA 2026 — dados salvos automaticamente neste navegador · <span id="resetLink" style="text-decoration:underline;cursor:pointer;">restaurar dados originais da planilha</span></footer>
 
 <script>
-const DATA = {"areas": [{"nome": "FINANCEIRO", "pesoTotal": 1, "bonusTotal": 0, "indicadores": [{"nome": "Faturamento", "pilar": "Resultado", "meta": 1, "peso": 0.25, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Alcançar 100% da meta de faturamento prevista no plano de crescimento, assegurando a execução das receitas planejadas para o período.", "valores": {"JAN": 0.96, "FEV": 1.04, "MAR": 1.04, "ABR": 1.01, "MAI": 1.07, "JUN": 1.11, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Cobrança ", "pilar": "Resultado", "meta": 14000, "peso": 0.25, "tipo": "numero", "direcao": "min", "agregacao": "media", "descricao": "Manter a inadimplência mensal em, no máximo, 2% do faturamento, considerando os títulos vencidos no período compreendido entre o dia 15 do mês anterior e o dia 15 do mês de apuração.", "valores": {"JAN": 3751, "FEV": 16828, "MAR": 2910, "ABR": 5400, "MAI": 9000, "JUN": 5700, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Price Increase", "pilar": "Resultado", "meta": 0.04, "peso": 0.35, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Renovar os contratos com reajuste médio mínimo de 4%, preservando a rentabilidade da carteira e mitigando os impactos da inflação e do aumento dos custos operacionais.", "valores": {"JAN": 0.073, "FEV": 0.02, "MAR": 0.04, "ABR": 0.128, "MAI": 0.043, "JUN": 0.043, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "RH", "pilar": "Resultado", "meta": 1, "peso": 0.15, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Garantir que 100% dos novos colaboradores sejam cadastrados na base de dados e que todas as informações cadastrais permaneçam completas, atualizadas e em conformidade com os processos internos.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "COMERCIAL - Priscila", "pesoTotal": 1, "bonusTotal": 0, "indicadores": [{"nome": "Meta de vendas", "pilar": "Vendas", "meta": 90000, "peso": 0.3, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Alcançar o faturamento mínimo de R$ 90.000 em novos contratos, ampliações de escopo ou venda de novos serviços durante o período de apuração.", "valores": {"JAN": 95344, "FEV": 207900, "MAR": 144755, "ABR": 122476, "MAI": 130693, "JUN": 94366, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Carteira de Propostas ", "pilar": "Vendas", "meta": 1.2, "peso": 0.2, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Manter um pipeline ativo de propostas comerciais no valor mínimo de R$ 1,2 milhão, garantindo volume suficiente para sustentar as metas futuras de vendas.", "valores": {"JAN": 1.4, "FEV": 1.1, "MAR": 1.2, "ABR": 1.2, "MAI": 1.2, "JUN": 1.2, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Coversão ", "pilar": "Vendas", "meta": 0.3, "peso": 0.15, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Converter mensalmente em novos negócios, no mínimo, 30% do valor total da carteira de propostas comerciais emitidas.", "valores": {"JAN": 0.89, "FEV": 0.89, "MAR": 0.89, "ABR": 0.89, "MAI": 0.89, "JUN": 0.89, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Atedendimento do plano estratégico", "pilar": "Prospecção", "meta": 0.8, "peso": 0.25, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Qualificação - 100% dos estatagnados/prospects \nConversão - 10% dos estatagnados/prospects", "valores": {"JAN": 0, "FEV": 0, "MAR": 0, "ABR": 0, "MAI": 0, "JUN": 0, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Prospecção ativa", "pilar": "Prospecção", "meta": 5, "peso": 0.1, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Gerar, no mínimo, cinco novas oportunidades comerciais qualificadas por mês, por meio de prospecção ativa, networking, LinkedIn ou outras ações de desenvolvimento de mercado.", "valores": {"JAN": 1, "FEV": 0, "MAR": 3, "ABR": 4, "MAI": 3, "JUN": 4, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "COMERCIAL - Bruna", "pesoTotal": 1, "bonusTotal": 0, "indicadores": [{"nome": "Meta de vendas", "pilar": "Vendas", "meta": 70000, "peso": 0.4, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Alcançar o faturamento mínimo de R$ 70.000 em novos contratos, ampliações de escopo ou venda de novos serviços durante o período de apuração.", "valores": {"JAN": 21700, "FEV": 40150, "MAR": 40000, "ABR": 0, "MAI": 0, "JUN": 299736, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Leads", "pilar": "Prospecção", "meta": 0.3, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Converter em oportunidades de negócio, no mínimo, 10% dos leads qualificados gerados pelas campanhas de marketing digital (RD Station, Google Ads e redes sociais) durante o mês.", "valores": {"JAN": 0, "FEV": 0, "MAR": 0, "ABR": 0, "MAI": 0, "JUN": 0, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "MKT Digital", "pilar": "Marketing", "meta": 1, "peso": 0.15, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Garantir a execução integral do plano de marketing digital, incluindo a gestão da agência, acompanhamento das campanhas, monitoramento dos indicadores de desempenho e implementação das ações previstas para geração de demanda e fortalecimento da marca.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Prospecção ativa", "pilar": "Prospecção", "meta": 5, "peso": 0.15, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Gerar, no mínimo, cinco novas oportunidades comerciais qualificadas por mês, por meio de prospecção ativa, networking, LinkedIn ou outras ações de desenvolvimento de mercado.", "valores": {"JAN": 10, "FEV": 10, "MAR": 16, "ABR": 7, "MAI": 6, "JUN": 12, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Coversão ", "pilar": "Vendas", "meta": 0.3, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Converter mensalmente em novos negócios, no mínimo, 30% do valor total da carteira de propostas comerciais emitidas.", "valores": {"JAN": 0.23, "FEV": 0.23, "MAR": 0.23, "ABR": 0.23, "MAI": 0.23, "JUN": 0.23, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "GERENTE DE OPERAÇÃO", "pesoTotal": 0.9999999999999999, "bonusTotal": 0, "indicadores": [{"nome": "Custos Operacionais", "pilar": "Resultado", "meta": 0.42, "peso": 0.3, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Manter os custos operacionais em, no máximo, 42% do faturamento líquido, garantindo a eficiência operacional e a rentabilidade da empresa.", "valores": {"JAN": 0.41723922827459, "FEV": 0.459659941862917, "MAR": 0.422291312073975, "ABR": 0.425831591621806, "MAI": 0.378436300222865, "JUN": 0.417251444865274, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Retenção de clientes", "pilar": "Qualidade", "meta": 0.9, "peso": 0.3, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Realizar reunião de resultados com 100% dos clientes corporativos em até 10 dias após o encerramento de cada ciclo de avaliação e executar, no mínimo, 90% das ações previstas no Plano Estratégico de Retenção e Relacionamento com Clientes.", "valores": {"JAN": 0.8, "FEV": 0.8, "MAR": 0.8, "ABR": 0.8, "MAI": 0.8, "JUN": 0.8, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Relacionamento", "pilar": "Qualidade", "meta": 1, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Produzir três conteúdos técnicos por semestre (um para cada programa de negócio).", "valores": {"JAN": 0.6, "FEV": 0.6, "MAR": 0.6, "ABR": 0.6, "MAI": 0.6, "JUN": 0.6, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Comunicação Técnica ", "pilar": "Qualidade", "meta": 1, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Desenvolver três vídeos de conteúdos técnicos por semestre, fortalecendo o relacionamento com clientes e o posicionamento técnico da empresa.", "valores": {"JAN": 0.6, "FEV": 0.6, "MAR": 0.6, "ABR": 0.6, "MAI": 0.6, "JUN": 0.6, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Leads", "pilar": "Vendas", "meta": 10, "peso": 0.1, "tipo": "numero", "direcao": "max", "agregacao": "soma", "descricao": "Gerar, no mínimo, 10 novos leads qualificados por trimestre, provenientes de novos clientes, oportunidades de venda cruzada (cross-selling) ou ampliação de escopo (upselling).", "valores": {"JAN": 4, "FEV": 1, "MAR": 5, "ABR": 4, "MAI": 5, "JUN": 6, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Capacitação e Retenção Ténica", "pilar": "Capacitação", "meta": null, "peso": 0.1, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Realizar capacitação trimestral e fornecer feedback individual para 100% da equipe interna (coordenadoras, assistentes e estagiários), promovendo o desenvolvimento contínuo e o alinhamento às diretrizes da empresa.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "SUPERVISÃO DE OPERAÇÃO (PROGRAMA EXCELÊNCIA)", "pesoTotal": 1, "bonusTotal": 0, "indicadores": [{"nome": "Retenção de clientes", "pilar": "Qualidade", "meta": 4.5, "peso": 0.25, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Análise crítica quinzenal dos resultados das auditorias dos shoppings, conduzindo reuniões gerenciais para avaliação dos indicadores e elaboração de planos de ação para os cinco shoppings com menor desempenho no período. Quando necessário, apoiar proativamente os clientes na construção, implementação e acompanhamento dos planos de ação, facilitando a execução das melhorias e contribuindo para a evolução contínua dos resultados.", "valores": {"JAN": 5, "FEV": 5, "MAR": 5, "ABR": 5, "MAI": 5, "JUN": 5, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Relacionamento", "pilar": "Qualidade", "meta": 0.75, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Obter retorno de, no mínimo, 75% das pesquisas de satisfação dos clientes do Programa Excelência, considerando a lista de clientes previamente definida.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Leads", "pilar": "Vendas", "meta": 5, "peso": 0.1, "tipo": "numero", "direcao": "max", "agregacao": "soma", "descricao": "Gerar, no mínimo, cinco oportunidades comerciais qualificadas por trimestre, provenientes de novos clientes, vendas cruzadas (cross-selling) ou ampliação de escopo (upselling).", "valores": {"JAN": 0, "FEV": 0, "MAR": 4, "ABR": 3, "MAI": 3, "JUN": 4, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Gestão de Risco", "pilar": "Qualidade", "meta": 1, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Responder 100% das reclamações registradas no sistema TOM Ticket dentro do prazo estabelecido no SLA, garantindo agilidade e qualidade no atendimento ao cliente.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Retenção de clientes", "pilar": "Qualidade", "meta": 1, "peso": 0.25, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Realizar reunião de pós-implantação com 100% dos novos clientes do Programa Excelência, validando a implantação, alinhando expectativas e identificando oportunidades de melhoria e retenção", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Avaliação da equipe técnica", "pilar": "Capacitação", "meta": 1, "peso": 0.05, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "oncluir o Onboarding – Etapa 2 – para 100% das novas nutricionistas e realizar avaliação técnica dos relatórios, com feedback estruturado após a primeira auditoria dos programas Excelência e Saúde 4.0.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Geração de valor", "pilar": "Qualidade", "meta": 1, "peso": 0.05, "tipo": "numero", "direcao": "max", "agregacao": "media", "descricao": "Promover soluções e melhorias para clientes do Programa de Excelência: desenvolvimento de materiais técnicos,  contribuição de melhorias em processos para clientes, desenvolvimento de 1 conteúdo técnico por mês para as redes sociais", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "COORDENADOR DE OPERAÇÃO (PROGRAMA PADRONIZA)", "pesoTotal": 1, "bonusTotal": 0.6, "indicadores": [{"nome": "Retenção de clientes", "pilar": "Qualidade", "meta": 0.9, "peso": 0.35, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Reter no mínimo 90% dos clientes de franquias e fazer avaliação dos resultados de cada ciclo e montagem de ações estratégicas em 100% dos clientes Padroniza( gestores)", "valores": {"JAN": 0.75, "FEV": 0.75, "MAR": 0.75, "ABR": 0.75, "MAI": 0.75, "JUN": 0.75, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Leads", "pilar": "Vendas", "meta": 5, "peso": 0.1, "tipo": "numero", "direcao": "max", "agregacao": "soma", "descricao": "Gerar, no mínimo, cinco oportunidades comerciais qualificadas por trimestre, provenientes de novos clientes, vendas cruzadas (cross-selling) ou ampliação de escopo (upselling).", "valores": {"JAN": 1, "FEV": 1, "MAR": 3, "ABR": 2, "MAI": 3, "JUN": 3, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Entrega ao cliente", "pilar": "Qualidade", "meta": 0.9, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Cumprimento de agenda mensal e Fechamentos dos relatórios gerenciais de auditoria dentro do prazo de cinco dias úteis após o encerramento das auditorias.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Relacionamento", "pilar": "Qualidade", "meta": 0.75, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Obter retorno de, no mínimo, 75% das pesquisas de satisfação dos clientes do Programa Excelência, considerando a lista de clientes previamente definida.", "valores": {"JAN": 0.75, "FEV": 0.75, "MAR": 0.75, "ABR": 0.75, "MAI": 0.75, "JUN": 0.75, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Avaliação da equipe técnica", "pilar": "Capacitação", "meta": 0.8, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Realizar feedback com 80% da equipe do Padroniza + feedback com 100% nas novas nutris do Padroniza", "valores": {"JAN": 0.8, "FEV": 0.8, "MAR": 0.8, "ABR": 0.8, "MAI": 0.8, "JUN": 0.8, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Geração de valor", "pilar": "Qualidade", "meta": 1, "peso": 0.15, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Promover soluções e melhorias para consultoria de franquias: desenvolvimento de materiais técnicos,  contribuição de melhorias em processos para clientes, treinamentos pilulas. (01 por mês)", "valores": {"JAN": 0.46, "FEV": 0.46, "MAR": 0.46, "ABR": 0.46, "MAI": 0.46, "JUN": 0.46, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "SUPORTE TÉCNICO", "pesoTotal": 1, "bonusTotal": 0.9875, "indicadores": [{"nome": "Entrega ao cliente", "pilar": "Qualidade", "meta": 0.9, "peso": 0.3, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Fechamentos dos relatórios de auditoria dentro do prazo (três após o encerramento das auditorias).", "valores": {"JAN": 1, "FEV": 1, "MAR": 0.9, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Atendimento", "pilar": "Qualidade", "meta": 1, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Registro e dar tratativa em 100% das demandas operacionais do Tom Ticket em conformidade com o SLA e o que com programa da Qualidade. responder dúvidas de clientes e/ou Nutris e enviar token.", "valores": {"JAN": 1, "FEV": 1, "MAR": 0.9, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Gestão de Roteiros", "pilar": "Qualidade", "meta": 1, "peso": 0.3, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Enviar a confirmação de agenda para Nutris e clientes  e checar, registrar e reportar diariamente os check in das Nutris.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Engajamento de Colaboradores", "pilar": "Suporte ", "meta": 1, "peso": 0.15, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Levantamento e envio de materias de apoio para as Nutris, ex.: Nincs, adesivos, crachás e uniforme.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Controle de Equipamentos Técnico", "pilar": "Qualidade", "meta": 1, "peso": 0.05, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Fazer controle da validade da calibração dos termometros das Nutris", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 0.5, "MAI": 0.5, "JUN": 0.5, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "TECNOLOGIA", "pesoTotal": 1, "bonusTotal": 0.43899999999999995, "indicadores": [{"nome": "Engajamento dos colaboradores", "pilar": "Comunicação", "meta": 1, "peso": 0.15, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Veicular todos os posts no grupo conexão nutris e motivar os participantes a curtirem e compartilharem as postagem", "valores": {"JAN": 0.8, "FEV": 0.8, "MAR": 0.8, "ABR": 0.8, "MAI": 0.8, "JUN": 0.8, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Sites e plataforma de Cursos", "pilar": "Processos", "meta": 1, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Garantir que os Sites Alimentarum, Tailler, Portal do cliente e a plataforma de cursos estejam em perfeita operação. Checagem diária", "valores": {"JAN": 0, "FEV": 0, "MAR": 0, "ABR": 0, "MAI": 0, "JUN": 0, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Help Desck OCNO", "pilar": "Processos", "meta": 1, "peso": 0.25, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Registro e tratativa em 100% dos chamados com Humanit em conformidade com SLA", "valores": {"JAN": 0.5, "FEV": 0.5, "MAR": 0.5, "ABR": 0.5, "MAI": 0.5, "JUN": 0.5, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Desenvolvimento do Sistema ", "pilar": "Processos", "meta": 1, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Contribuir com as melhorias e acompanhar os cartões no trello e gerenciar e cumprir os prazos.", "valores": {"JAN": 0.5, "FEV": 0.5, "MAR": 0.5, "ABR": 0.5, "MAI": 0.5, "JUN": 0.5, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Treinamento do sistema ", "pilar": "Capacitação", "meta": 1, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Construir manuais e/ou videos de treinamentos para garantir que 100% dos usuários sejam treinados e atualizados", "valores": {"JAN": 0, "FEV": 0, "MAR": 0, "ABR": 0, "MAI": 0, "JUN": 0, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}, {"nome": "COORDENADOR DE OPERAÇÃO (PROGRAMA SAÚDE 4.0)", "pesoTotal": 1, "bonusTotal": 0.6, "indicadores": [{"nome": "Retenção de clientes", "pilar": "Qualidade", "meta": 0.9, "peso": 0.3, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Reter no mínimo 90% de clientes fazer avaliação dos resultados de cada ciclo e montagem de ações estratégicas em 100% dos clientes Padroniza( gestores)", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Leads", "pilar": "vendas", "meta": 5, "peso": 0.2, "tipo": "numero", "direcao": "max", "agregacao": "soma", "descricao": "Gerar, no mínimo, cinco oportunidades comerciais qualificadas por trimestre, provenientes de novos clientes, vendas cruzadas (cross-selling) ou ampliação de escopo (upselling).", "valores": {"JAN": 1, "FEV": 2, "MAR": 2, "ABR": 2, "MAI": 2, "JUN": 2, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Entrega ao cliente", "pilar": "Qualidade", "meta": 0.9, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Cumprimento de agenda mensal e Fechamentos dos relatórios gerenciais de auditoria dentro do prazo de cinco dias úteis após o encerramento das auditorias.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Retenção de clientes", "pilar": "Qualidade", "meta": 0.8, "peso": 0.2, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Cumprir o plano estratégico de Retenção / Resultados  (80% NPS dos clientes do Saúde 4.0.", "valores": {"JAN": 1, "FEV": 1, "MAR": 1, "ABR": 1, "MAI": 1, "JUN": 1, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Capacitação Técnica", "pilar": "Capacitação", "meta": 1, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Realizar feedback com 80% da equipe do Saúde 4.0 + feedback com 100% nas novas nutris do Saúde 4.0 (se houver)", "valores": {"JAN": null, "FEV": null, "MAR": null, "ABR": null, "MAI": null, "JUN": null, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}, {"nome": "Geração de valor", "pilar": "Qualidade", "meta": 1, "peso": 0.1, "tipo": "percentual", "direcao": "max", "agregacao": "media", "descricao": "Promover soluções e melhorias para o Programa Saúde 4.0: desenvolvimento de materiais técnicos,  contribuição de melhorias em processos para clientes, desenvolvimento de 1 conteúdo técnico por mês para as redes sociais", "valores": {"JAN": 0.5, "FEV": 0.5, "MAR": 0.5, "ABR": 0.5, "MAI": 0.5, "JUN": 0.5, "JUL": null, "AGO": null, "SET": null, "OUT": null, "NOV": null, "DEZ": null}}]}], "months": ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"]};
+const STORAGE_KEY = 'pea26-items-v1';
 
-const MESES = DATA.months;
+/* ------------------------------------------------------------------ *
+ * INTEGRAÇÃO COM O GOOGLE SHEETS (opcional)
+ * Depois de publicar o Apps Script (ver GUIA_INSTALACAO.md), cole aqui
+ * a URL do Web App para que o painel passe a ser compartilhado entre
+ * toda a equipe, com notificação por e-mail de atrasos e atualizações.
+ * Enquanto não configurar, o painel funciona normalmente salvando
+ * apenas neste navegador.
+ * ------------------------------------------------------------------ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbw1RNtX6snsGh8ZX108UrxYdQQlrdL8RL6ystwt2oT8M6wOSD4q3Wk3oG8odZx-Vkcp/exec';
+const SYNC_ENABLED = API_URL && !API_URL.includes('COLE_AQUI');
+const AUTO_REFRESH_MS = 45000; // busca atualizações da equipe a cada 45s
 
-// ---- Períodos: mês, trimestre, semestre ----
-const PERIODOS = {
-  // meses individuais
-  'M:JAN': ['JAN'], 'M:FEV': ['FEV'], 'M:MAR': ['MAR'], 'M:ABR': ['ABR'],
-  'M:MAI': ['MAI'], 'M:JUN': ['JUN'], 'M:JUL': ['JUL'], 'M:AGO': ['AGO'],
-  'M:SET': ['SET'], 'M:OUT': ['OUT'], 'M:NOV': ['NOV'], 'M:DEZ': ['DEZ'],
-  // trimestres
-  'Q:T1': ['JAN','FEV','MAR'], 'Q:T2': ['ABR','MAI','JUN'],
-  'Q:T3': ['JUL','AGO','SET'], 'Q:T4': ['OUT','NOV','DEZ'],
-  // semestres
-  'S:S1': ['JAN','FEV','MAR','ABR','MAI','JUN'], 'S:S2': ['JUL','AGO','SET','OUT','NOV','DEZ'],
-};
+const SEED_ITEMS = [
+  {
+    "id": "item-01",
+    "num": 16,
+    "melhoria": "Implantar LGPD Programa de proteção de dados",
+    "swot": "Fraquezas",
+    "setor": "ADM",
+    "ano": 2025,
+    "responsavel": "Edvania",
+    "acao": "enviar politica / os / uso de equipamentos / epis para todos CLT e estágiário - atualizar os prontuários",
+    "descricao": "13/04 - Temos um novo assessor e o plano está em prática.",
+    "objetivo": "RH",
+    "local": "EXTERNO",
+    "planoLog": [
+      "1. Vamos enviar e atualizar todos os documentos nas pastas;",
+      "2. Também iremos criar os processos internos que a atulização seja continuada."
+    ],
+    "prazo": "2026-05-31",
+    "status": "INICIADO",
+    "andamento": 0.7
+  },
+  {
+    "id": "item-02",
+    "num": 17,
+    "melhoria": "",
+    "swot": "",
+    "setor": "FIN",
+    "ano": 2025,
+    "responsavel": "Jose",
+    "acao": "confrontar faturamento x portifolio técnico - montar processo de checagem mensal",
+    "descricao": "",
+    "objetivo": "FINANCEIRO",
+    "local": "",
+    "planoLog": [
+      "Faremos mensalmente esta conciliação"
+    ],
+    "prazo": "2026-02-10",
+    "status": "FINALIZADO",
+    "andamento": 1
+  },
+  {
+    "id": "item-03",
+    "num": 18,
+    "melhoria": "",
+    "swot": "",
+    "setor": "FIN",
+    "ano": 2025,
+    "responsavel": "Fabiana",
+    "acao": "Montar sistemática Mensal de controle de custo por cliente - zag x faturamento",
+    "descricao": "",
+    "objetivo": "ANALISE RESULTADO",
+    "local": "",
+    "planoLog": [],
+    "prazo": "",
+    "status": "INICIADO",
+    "andamento": 0.9
+  },
+  {
+    "id": "item-04",
+    "num": 19,
+    "melhoria": "Padronização das auditorias (atendimento uniforme)",
+    "swot": "Fraquezas",
+    "setor": "TEC",
+    "ano": 2025,
+    "responsavel": "Fabiana",
+    "acao": "criar manual dos serviços por programas ( começar padroniza - Saúde 4.0 - Excelencia",
+    "descricao": "",
+    "objetivo": "PADRONIZAR  AUDITORIA",
+    "local": "EXTERNO",
+    "planoLog": [],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-05",
+    "num": 20,
+    "melhoria": "",
+    "swot": "",
+    "setor": "TEC",
+    "ano": 2025,
+    "responsavel": "Fabiana",
+    "acao": "Criar  Manual de rotinas/job description revisar fluxos já existentes dos departamentos",
+    "descricao": "",
+    "objetivo": "PADRONIZAR  AUDITORIA",
+    "local": "",
+    "planoLog": [],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-06",
+    "num": 1,
+    "melhoria": "Buscar uma nova empresa de tecnologia",
+    "swot": "Fraquezas",
+    "setor": "TI",
+    "ano": 2025,
+    "responsavel": "Fabiana",
+    "acao": "Comunicação interna e para clientes da nova metodologia de agenda- verificar folder - enviar viazap ( nutris) - Mandar video explicando ( alexsandra)- clientes- RD station  - \nInicio das confirmações em junho para agenda de julho- treinar eloisa/duda",
+    "descricao": "13/04 - Houve atraso do fornecedor na entrega do plano para 24, isso demonstra mais do que nunca a necessidade de deselvolvermos novos fornecedores;\n13/04 - Iremos fazer uma aquisição no meio do ano que trará um sistema e um novo fornecedor de tecnologia, iremos analisar o potencial do novo fornecedor.\n03/11 - Temos nova equipe de desenvolvimento (Centro Oeste) e contratamos um estagiário com foco nessa área.",
+    "objetivo": "AGENDA",
+    "local": "EXTERNO",
+    "planoLog": [],
+    "prazo": "2026-05-31",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-07",
+    "num": 14,
+    "melhoria": "",
+    "swot": "",
+    "setor": "TI",
+    "ano": 2025,
+    "responsavel": "Jose",
+    "acao": "Deixar so uma assinatura google - migrar para grupo hsa",
+    "descricao": "",
+    "objetivo": "GMAIL",
+    "local": "",
+    "planoLog": [],
+    "prazo": "2026-05-31",
+    "status": "ATRASADO",
+    "andamento": 0.2
+  },
+  {
+    "id": "item-08",
+    "num": 15,
+    "melhoria": "",
+    "swot": "",
+    "setor": "TI",
+    "ano": 2025,
+    "responsavel": "Jose",
+    "acao": "Follow up da finalização do novo APP /agendamento da homologação com área técnica / alinhar data de publicação",
+    "descricao": "13/04 - Iniciamos a analise no mês passado, mas nos deparamos com inconsistências dos relatórios;\n30/06 - Relatórios arrumados.",
+    "objetivo": "NOVO APP",
+    "local": "INTERNO",
+    "planoLog": [],
+    "prazo": "2026-05-31",
+    "status": "FINALIZADO",
+    "andamento": 1
+  },
+  {
+    "id": "item-09",
+    "num": 10,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "COM",
+    "ano": 2026,
+    "responsavel": "Fabiana",
+    "acao": "Novo programa, ex.: saúde 4.0",
+    "descricao": "",
+    "objetivo": "OPORTUNIDADES",
+    "local": "",
+    "planoLog": [
+      "Divulgar para as nutris (interno) e redes Sociais (externos),"
+    ],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-10",
+    "num": 11,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "COM",
+    "ano": 2026,
+    "responsavel": "Jose",
+    "acao": "Indicações Leads",
+    "descricao": "",
+    "objetivo": "OPORTUNIDADES",
+    "local": "",
+    "planoLog": [],
+    "prazo": "2026-09-30",
+    "status": "INICIADO",
+    "andamento": 0.4
+  },
+  {
+    "id": "item-11",
+    "num": 2,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "MK",
+    "ano": 2026,
+    "responsavel": "Fabiana",
+    "acao": "Não se ater as oportunidades em campo",
+    "descricao": "13/04 - Iniciamos a analise no mês passado, mas nos deparamos com inconsistências dos relatórios;\n30/06 - Relatórios arrumados.",
+    "objetivo": "FRAQUEZAS",
+    "local": "INTERNO",
+    "planoLog": [
+      "Opertunidade de indicação de Leads, treinar e conscientizar nutricionistas principalmente as CLT."
+    ],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-12",
+    "num": 13,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "MK",
+    "ano": 2026,
+    "responsavel": "Fabiana",
+    "acao": "Plataforma de treinamentos e fracionados",
+    "descricao": "",
+    "objetivo": "OPORTUNIDADES",
+    "local": "",
+    "planoLog": [],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-13",
+    "num": 5,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "RH",
+    "ano": 2026,
+    "responsavel": "Edvania",
+    "acao": "Falta de comunicação de novos funcionários",
+    "descricao": "",
+    "objetivo": "FRAQUEZAS",
+    "local": "",
+    "planoLog": [
+      "Melhorar o processo de comunicação para time interno e externo."
+    ],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-14",
+    "num": 6,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "TEC",
+    "ano": 2026,
+    "responsavel": "Erika",
+    "acao": "Falta de clareza quando temos uma nova loja",
+    "descricao": "",
+    "objetivo": "FRAQUEZAS",
+    "local": "",
+    "planoLog": [],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-15",
+    "num": 8,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "TEC",
+    "ano": 2026,
+    "responsavel": "Erika",
+    "acao": "Mix de loja – x Hd",
+    "descricao": "",
+    "objetivo": "FRAQUEZAS",
+    "local": "",
+    "planoLog": [],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-16",
+    "num": 9,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "TEC",
+    "ano": 2026,
+    "responsavel": "Erika",
+    "acao": "Material de consultoria",
+    "descricao": "",
+    "objetivo": "FRAQUEZAS",
+    "local": "",
+    "planoLog": [],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-17",
+    "num": 12,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "TEC",
+    "ano": 2026,
+    "responsavel": "Erika",
+    "acao": "Auditorias remotas",
+    "descricao": "",
+    "objetivo": "OPORTUNIDADES",
+    "local": "",
+    "planoLog": [],
+    "prazo": "",
+    "status": "PENDENTE",
+    "andamento": 0
+  },
+  {
+    "id": "item-18",
+    "num": 3,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "TI",
+    "ano": 2026,
+    "responsavel": "Jose",
+    "acao": "Travamento do APP",
+    "descricao": "",
+    "objetivo": "FRAQUEZAS",
+    "local": "",
+    "planoLog": [
+      "Implantação do novo app"
+    ],
+    "prazo": "2026-05-31",
+    "status": "FINALIZADO",
+    "andamento": 1
+  },
+  {
+    "id": "item-19",
+    "num": 4,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "TI",
+    "ano": 2026,
+    "responsavel": "Jose",
+    "acao": "Lentidão no desenvolvimento",
+    "descricao": "",
+    "objetivo": "FRAQUEZAS",
+    "local": "",
+    "planoLog": [
+      "Vamos estar exigentes com prazos"
+    ],
+    "prazo": "2026-05-31",
+    "status": "ATRASADO",
+    "andamento": 0.5
+  },
+  {
+    "id": "item-20",
+    "num": 7,
+    "melhoria": "Instabilidade do sistema",
+    "swot": "Ameaças",
+    "setor": "TI",
+    "ano": 2026,
+    "responsavel": "Jose",
+    "acao": "Ninc é ruim em papel",
+    "descricao": "",
+    "objetivo": "FRAQUEZAS",
+    "local": "",
+    "planoLog": [
+      "Implantação do novo app"
+    ],
+    "prazo": "2026-05-31",
+    "status": "FINALIZADO",
+    "andamento": 1
+  }
+];
 
-const PERIODO_LABEL = {
-  'Q:T1': 'T1 (Jan–Mar)', 'Q:T2': 'T2 (Abr–Jun)', 'Q:T3': 'T3 (Jul–Set)', 'Q:T4': 'T4 (Out–Dez)',
-  'S:S1': 'S1 (Jan–Jun)', 'S:S2': 'S2 (Jul–Dez)',
-};
+const STATUS_OPTIONS = ['PENDENTE','INICIADO','FINALIZADO','ATRASADO'];
 
-function periodoLabel(valor) {
-  if (PERIODO_LABEL[valor]) return PERIODO_LABEL[valor];
-  return valor.split(':')[1]; // meses: "M:MAR" -> "MAR"
+let items = [];
+let saveTimer = null;
+
+function progressGradient(pct){
+  if(pct >= 100) return 'linear-gradient(90deg,#3E8F61,#7FCB9C)';   // 100% — verde
+  if(pct >= 71)  return 'linear-gradient(90deg,#2F6FA8,#7EB2E0)';   // 71–99% — azul
+  if(pct >= 31)  return 'linear-gradient(90deg,#C98A22,#F0D28B)';   // 31–70% — amarelo
+  return 'linear-gradient(90deg,#BF4A32,#E2876D)';                  // 0–30% — vermelho
 }
 
-const selectEl = document.getElementById('mesSelect');
-
-function addOptGroup(label, entries) {
-  const grp = document.createElement('optgroup');
-  grp.label = label;
-  entries.forEach(([valor, texto]) => {
-    const opt = document.createElement('option');
-    opt.value = valor; opt.textContent = texto;
-    grp.appendChild(opt);
-  });
-  selectEl.appendChild(grp);
+function initials(name){
+  if(!name) return '—';
+  return name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 }
-addOptGroup('Mês', MESES.map(m => ['M:' + m, m]));
-addOptGroup('Trimestre', ['T1','T2','T3','T4'].map(t => ['Q:' + t, PERIODO_LABEL['Q:' + t]]));
-addOptGroup('Semestre', ['S1','S2'].map(s => ['S:' + s, PERIODO_LABEL['S:' + s]]));
 
-function defaultPeriodo() {
-  // escolhe o mês com mais indicadores preenchidos (evita cair num mês com só 1 valor solto)
-  let melhorMes = MESES[0];
-  let melhorContagem = -1;
-  MESES.forEach(m => {
-    let contagem = 0;
-    DATA.areas.forEach(a => a.indicadores.forEach(ind => {
-      if (ind.valores[m] !== null && ind.valores[m] !== undefined) contagem++;
-    }));
-    if (contagem >= melhorContagem && contagem > 0) {
-      melhorContagem = contagem;
-      melhorMes = m;
+function fmtDate(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function isOverdue(iso, status){
+  if(!iso || status === 'FINALIZADO') return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dl = new Date(iso+'T00:00:00');
+  return dl < today;
+}
+
+function setSaveState(saving){
+  const dot = document.getElementById('saveDot');
+  const txt = document.getElementById('saveText');
+  if(saving){
+    dot.classList.add('saving');
+    txt.textContent = 'salvando…';
+  } else {
+    dot.classList.remove('saving');
+    txt.textContent = 'tudo salvo';
+  }
+}
+
+function setSyncBadge(){
+  const el = document.getElementById('syncBadge');
+  if(!el) return;
+  el.textContent = SYNC_ENABLED
+    ? '● sincronizado com a equipe (Google Sheets)'
+    : '○ modo local — dados salvos só neste navegador';
+}
+
+function normalizeItems(list){
+  return (list || []).map(it => ({
+    ...it,
+    andamento: Number(it.andamento) || 0,
+    planoLog: Array.isArray(it.planoLog) ? it.planoLog : [],
+    ano: it.ano,
+  }));
+}
+
+async function loadItems(){
+  if(SYNC_ENABLED){
+    try{
+      const res = await fetch(API_URL, { method:'GET' });
+      const data = await res.json();
+      if(data && data.ok && Array.isArray(data.items) && data.items.length){
+        items = normalizeItems(data.items);
+        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }catch(e){}
+        return;
+      }
+    }catch(e){
+      console.error('Não foi possível buscar dados do servidor, usando cópia local.', e);
     }
-  });
-  return 'M:' + melhorMes;
-}
-selectEl.value = defaultPeriodo();
-
-function statusClasse(pct) {
-  if (pct === null) return 'cinza';
-  if (pct >= 1) return 'verde';
-  if (pct >= 0.8) return 'amarelo';
-  return 'vermelho';
-}
-function statusTexto(pct) {
-  if (pct === null) return '– sem dado';
-  if (pct >= 1) return '🟢 No alvo';
-  if (pct >= 0.8) return '🟡 Atenção';
-  return '🔴 Crítico';
-}
-function fmtPct(pct) {
-  if (pct === null) return '–';
-  return (pct * 100).toFixed(0) + '%';
-}
-
-function valorPeriodo(ind, meses) {
-  // meses do período que já têm resultado lançado (ignora os em branco)
-  const vals = meses.map(m => ind.valores[m]).filter(v => v !== null && v !== undefined);
-  if (vals.length === 0) return null;
-  if (ind.agregacao === 'soma') {
-    // contagem acumulada no período (ex.: Leads) — soma os meses, não faz média
-    return vals.reduce((a, b) => a + b, 0);
   }
-  return vals.reduce((a, b) => a + b, 0) / vals.length;
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      items = JSON.parse(raw);
+      return;
+    }
+  }catch(e){ /* localStorage indisponível ou vazio */ }
+  items = JSON.parse(JSON.stringify(SEED_ITEMS));
+  await persist();
 }
 
-function metaEfetiva(ind, meses) {
-  if (ind.agregacao === 'soma') {
-    // meta é definida por trimestre (3 meses); escala proporcionalmente ao período selecionado
-    return ind.meta * (meses.length / 3);
+async function persist(){
+  setSaveState(true);
+  clearTimeout(saveTimer);
+  return new Promise((resolve)=>{
+    saveTimer = setTimeout(async ()=>{
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }catch(e){}
+      if(SYNC_ENABLED){
+        try{
+          const res = await fetch(API_URL, {
+            method:'POST',
+            headers:{ 'Content-Type':'text/plain;charset=utf-8' }, // evita preflight CORS no Apps Script
+            body: JSON.stringify({ action:'save', items })
+          });
+          const data = await res.json();
+          if(data && Array.isArray(data.items)){
+            // O servidor respondeu com uma lista de itens em vez de confirmar o salvamento —
+            // isso indica que o POST não chegou no backend (provável redirecionamento do Google).
+            showSyncError('O salvamento não foi confirmado pelo servidor (o pedido pode ter sido redirecionado). Tente novamente ou revise a implantação do Apps Script.');
+          } else if(!data || data.ok !== true){
+            showSyncError('O servidor recusou o salvamento: ' + (data && data.error ? data.error : 'erro desconhecido'));
+          } else {
+            hideSyncError();
+          }
+        }catch(e){
+          console.error('Não foi possível sincronizar com o servidor.', e);
+          showSyncError('Não foi possível conectar ao servidor. As edições ficaram salvas só neste navegador por enquanto.');
+        }
+      }
+      setSaveState(false);
+      resolve();
+    }, 500);
+  });
+}
+
+function showSyncError(msg){
+  let banner = document.getElementById('syncErrorBanner');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = 'syncErrorBanner';
+    banner.style.cssText = 'background:#F7E4DF;color:#8A2F1C;border:1px solid #E0AFA1;border-radius:4px;padding:10px 16px;margin:0 clamp(16px,4vw,48px) 0;font-size:13px;position:sticky;top:0;z-index:30;';
+    document.querySelector('.filters-wrap').insertAdjacentElement('beforebegin', banner);
   }
-  return ind.meta;
+  banner.textContent = '⚠ ' + msg;
+  banner.style.display = 'block';
 }
 
-function calcIndPct(ind, meses) {
-  const v = valorPeriodo(ind, meses);
-  const meta = metaEfetiva(ind, meses);
-  if (v === null || !meta) return null;
-  if (ind.direcao === 'min') {
-    // indicador de teto (quanto menor o resultado, melhor): espelha em torno de 100% =  no limite
-    return 2 - (v / meta);
-  }
-  return v / meta;
+function hideSyncError(){
+  const banner = document.getElementById('syncErrorBanner');
+  if(banner) banner.style.display = 'none';
 }
 
-function calcAreaPct(area, meses) {
-  let num = 0, den = 0;
-  area.indicadores.forEach(ind => {
-    const pct = calcIndPct(ind, meses);
-    if (pct === null) return;
-    num += pct * ind.peso;
-    den += ind.peso;
-  });
-  if (den === 0) return null;
-  return num / den;
-}
-
-function fmtValor(v, tipo) {
-  if (v === null || v === undefined) return '–';
-  if (tipo === 'percentual') return (v * 100).toFixed(1) + '%';
-  return v.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
-}
-
-const openDetails = new Set();
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-let infoIconSeq = 0;
-
-function buildDetailTable(area, meses, label, idx) {
-  const rows = area.indicadores.map(ind => {
-    const pct = calcIndPct(ind, meses);
-    const cls = statusClasse(pct);
-    const valor = valorPeriodo(ind, meses);
-    const meta = metaEfetiva(ind, meses);
-    const infoId = 'info-' + (infoIconSeq++);
-    const info = ind.descricao ? `
-          <span class="mb-info-icon" id="${infoId}">i<span class="mb-info-tip">${escapeHtml(ind.descricao)}</span></span>` : '';
-    return `
-      <tr>
-        <td>${ind.nome}${info}</td>
-        <td>${ind.pilar || '-'}</td>
-        <td class="num">${fmtValor(meta, ind.tipo)}${ind.direcao === 'min' ? ' (máx.)' : ''}${ind.agregacao === 'soma' ? ' (' + label + ')' : ''}</td>
-        <td class="num">${(ind.peso * 100).toFixed(0)}%</td>
-        <td class="num">${fmtValor(valor, ind.tipo)}</td>
-        <td class="num">
-          <span class="mb-mini-bar-track"><span class="mb-mini-bar-fill status-${cls}" style="width:${pct !== null ? Math.min(pct*100,100) : 0}%"></span></span>
-          ${fmtPct(pct)}
-        </td>
-        <td><span class="mb-mini-badge status-${cls}">${statusTexto(pct)}</span></td>
-      </tr>`;
-  }).join('');
-  return `
-    <div class="mb-detail" id="detail-${idx}" style="display:${openDetails.has(idx) ? 'block' : 'none'}">
-      <table>
-        <thead>
-          <tr>
-            <th>Indicador</th><th>Pilar</th><th class="num">Meta</th><th class="num">Peso</th>
-            <th class="num">Resultado (${label})</th><th class="num">% Atingimento</th><th>Status</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
-}
-
-function toggleDetail(idx) {
-  if (openDetails.has(idx)) openDetails.delete(idx); else openDetails.add(idx);
-  render();
-}
-
-let chart = null;
-
-function render() {
-  const periodoValor = selectEl.value;
-  const meses = PERIODOS[periodoValor];
-  const label = periodoLabel(periodoValor);
-  const cardsWrap = document.getElementById('cardsWrap');
-  cardsWrap.innerHTML = '';
-
-  let somaPct = 0, countPct = 0, somaBonus = 0, countBonus = 0;
-  const labels = [], valores = [], cores = [];
-
-  DATA.areas.forEach((area, idx) => {
-    const pct = calcAreaPct(area, meses);
-    const bonusPct = area.pesoTotal ? (area.bonusTotal / area.pesoTotal) : null;
-    const cls = statusClasse(pct);
-
-    if (pct !== null) { somaPct += pct; countPct++; }
-    if (bonusPct !== null) { somaBonus += bonusPct; countBonus++; }
-
-    labels.push(area.nome);
-    valores.push(pct !== null ? +(pct * 100).toFixed(1) : 0);
-    cores.push({verde:'#2ecc71', amarelo:'#f4b400', vermelho:'#e74c3c', cinza:'#c7ccd3'}[cls]);
-
-    const isOpen = openDetails.has(idx);
-    const card = document.createElement('div');
-    card.className = 'mb-card status-' + cls;
-    card.innerHTML = `
-      <div class="mb-card-top">
-        <h3>${area.nome}</h3>
-        <span class="mb-badge status-${cls}">${statusTexto(pct)}</span>
-      </div>
-      <div class="mb-pct">${fmtPct(pct)}</div>
-      <div class="mb-bar-track"><div class="mb-bar-fill status-${cls}" style="width:${pct !== null ? Math.min(pct*100,100) : 0}%"></div></div>
-      <div class="mb-meta-row">
-        <span>Peso total: <b>${fmtPct(area.pesoTotal)}</b></span>
-        <span>Bônus: <b>${fmtPct(bonusPct)}</b></span>
-      </div>
-      <span class="mb-toggle" data-idx="${idx}">${isOpen ? '▾ Ocultar indicadores' : '▸ Ver indicadores (' + area.indicadores.length + ')'}</span>
-    `;
-    cardsWrap.appendChild(card);
-    cardsWrap.insertAdjacentHTML('beforeend', buildDetailTable(area, meses, label, idx));
-  });
-
-  cardsWrap.querySelectorAll('.mb-toggle').forEach(el => {
-    el.addEventListener('click', () => toggleDetail(+el.dataset.idx));
-  });
-
-  document.getElementById('totAreas').textContent = DATA.areas.length;
-  document.getElementById('totPct').textContent = countPct ? fmtPct(somaPct / countPct) : '–';
-  document.getElementById('totBonus').textContent = countBonus ? fmtPct(somaBonus / countBonus) : '–';
-  document.getElementById('chartTitle').textContent = `% Atingimento por área — ${label}`;
-
-  const ctx = document.getElementById('chartAreas').getContext('2d');
-  if (chart) chart.destroy();
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: '% Atingimento',
-        data: valores,
-        backgroundColor: cores,
-        borderRadius: 6,
-        maxBarThickness: 48
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { beginAtZero: true, ticks: { callback: v => v + '%' } },
-        x: { ticks: { autoSkip: false, maxRotation: 30, minRotation: 0 } }
+async function refreshFromServer(){
+  if(!SYNC_ENABLED) return;
+  try{
+    const res = await fetch(API_URL, { method:'GET' });
+    const data = await res.json();
+    if(data && data.ok && Array.isArray(data.items)){
+      const incoming = JSON.stringify(normalizeItems(data.items));
+      if(incoming !== JSON.stringify(items)){
+        items = JSON.parse(incoming);
+        populateFilterOptions();
+        renderGauges();
+        renderCards();
       }
     }
+  }catch(e){ /* falha silenciosa — tenta de novo no próximo ciclo */ }
+}
+
+function uniqueSorted(arr){
+  return [...new Set(arr.filter(v=>v !== '' && v!==null && v!==undefined))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'));
+}
+
+function populateFilterOptions(){
+  const setores = uniqueSorted(items.map(i=>i.setor));
+  const resps = uniqueSorted(items.map(i=>i.responsavel));
+  const swots = uniqueSorted(items.map(i=>i.swot));
+  const anos = uniqueSorted(items.map(i=>i.ano));
+
+  fillSelect('fSetor', setores, 'Setor · todos');
+  fillSelect('fResp', resps, 'Responsável · todos');
+  fillSelect('fStatus', STATUS_OPTIONS, 'Status · todos');
+  fillSelect('fSwot', swots, 'SWOT · todos');
+  fillSelect('fAno', anos, 'Ano · todos');
+}
+
+function fillSelect(id, values, placeholder){
+  const sel = document.getElementById(id);
+  const current = sel.value;
+  sel.innerHTML = `<option value="">${placeholder}</option>` + values.map(v=>`<option value="${escapeHtml(String(v))}">${escapeHtml(String(v))}</option>`).join('');
+  if(values.includes(current)) sel.value = current;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function getFiltered(){
+  const q = document.getElementById('fSearch').value.trim().toLowerCase();
+  const setor = document.getElementById('fSetor').value;
+  const resp = document.getElementById('fResp').value;
+  const status = document.getElementById('fStatus').value;
+  const swot = document.getElementById('fSwot').value;
+  const ano = document.getElementById('fAno').value;
+  const sortBy = document.getElementById('fSort').value;
+
+  let out = items.filter(it=>{
+    if(setor && it.setor !== setor) return false;
+    if(resp && it.responsavel !== resp) return false;
+    if(status && it.status !== status) return false;
+    if(swot && it.swot !== swot) return false;
+    if(ano && String(it.ano) !== ano) return false;
+    if(q){
+      const hay = [it.melhoria,it.acao,it.objetivo,it.descricao,it.local,it.responsavel,it.setor, ...(it.planoLog||[])].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  out.sort((a,b)=>{
+    if(sortBy === 'prazo'){
+      if(!a.prazo && !b.prazo) return 0;
+      if(!a.prazo) return 1;
+      if(!b.prazo) return -1;
+      return a.prazo.localeCompare(b.prazo);
+    }
+    if(sortBy === 'andamento') return (b.andamento||0) - (a.andamento||0);
+    return String(a[sortBy]||'').localeCompare(String(b[sortBy]||''),'pt-BR');
+  });
+
+  return out;
+}
+
+function renderGauges(){
+  const counts = {PENDENTE:0, INICIADO:0, FINALIZADO:0, ATRASADO:0};
+  items.forEach(i=>{ if(counts[i.status] !== undefined) counts[i.status]++; });
+  const total = items.length;
+  const activeStatus = document.getElementById('fStatus').value;
+
+  const gaugeRow = document.getElementById('gaugeRow');
+  gaugeRow.innerHTML = `
+    <div class="gauge total ${activeStatus===''?'active':''}" data-filter=""><div class="num">${total}</div><div class="lbl">Total de ações</div></div>
+    <div class="gauge pendente ${activeStatus==='PENDENTE'?'active':''}" data-filter="PENDENTE"><div class="num">${counts.PENDENTE}</div><div class="lbl">Pendente</div></div>
+    <div class="gauge iniciado ${activeStatus==='INICIADO'?'active':''}" data-filter="INICIADO"><div class="num">${counts.INICIADO}</div><div class="lbl">Iniciado</div></div>
+    <div class="gauge finalizado ${activeStatus==='FINALIZADO'?'active':''}" data-filter="FINALIZADO"><div class="num">${counts.FINALIZADO}</div><div class="lbl">Finalizado</div></div>
+    <div class="gauge atrasado ${activeStatus==='ATRASADO'?'active':''}" data-filter="ATRASADO"><div class="num">${counts.ATRASADO}</div><div class="lbl">Atrasado</div></div>
+  `;
+  gaugeRow.querySelectorAll('.gauge').forEach(g=>{
+    g.addEventListener('click', ()=>{
+      const val = g.dataset.filter;
+      const sel = document.getElementById('fStatus');
+      sel.value = (sel.value === val) ? '' : val;
+      renderGauges();
+      renderCards();
+    });
+  });
+
+  const bar = document.getElementById('overviewBar');
+  const colors = {PENDENTE:'var(--st-pendente)', INICIADO:'var(--st-iniciado)', FINALIZADO:'var(--st-finalizado)', ATRASADO:'var(--st-atrasado)'};
+  bar.innerHTML = STATUS_OPTIONS.map(s=>{
+    const pct = total ? (counts[s]/total*100) : 0;
+    return pct>0 ? `<span data-filter="${s}" style="width:${pct}%;background:${colors[s]}" title="${s} — clique para filtrar"></span>` : '';
+  }).join('');
+  bar.querySelectorAll('span').forEach(seg=>{
+    seg.addEventListener('click', ()=>{
+      const val = seg.dataset.filter;
+      const sel = document.getElementById('fStatus');
+      sel.value = (sel.value === val) ? '' : val;
+      renderGauges();
+      renderCards();
+    });
+  });
+
+  const avgProgress = total ? (items.reduce((s,i)=>s+(i.andamento||0),0)/total*100) : 0;
+  document.getElementById('gpFill').style.width = avgProgress + '%';
+  document.getElementById('gpFill').style.background = progressGradient(Math.round(avgProgress));
+  document.getElementById('gpPct').textContent = Math.round(avgProgress) + '%';
+}
+
+function renderCards(){
+  const list = getFiltered();
+  const container = document.getElementById('cardsContainer');
+  document.getElementById('resultCount').textContent = `${list.length} de ${items.length} ações exibidas`;
+
+  if(list.length === 0){
+    container.innerHTML = `<div class="empty-state"><div class="big">Nenhuma ação encontrada</div>Ajuste os filtros para ver outros resultados.</div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(it => cardTemplate(it)).join('');
+
+  list.forEach(it=>{
+    const card = document.querySelector(`[data-id="${it.id}"]`);
+    if(!card) return;
+
+    const slider = card.querySelector('.progress-slider');
+    const fill = card.querySelector('.progress-fill');
+    const pctLabel = card.querySelector('.progress-pct');
+
+    card.querySelector('.status-select').addEventListener('change', async (e)=>{
+      it.status = e.target.value;
+      e.target.className = 'status-select st-' + it.status;
+      card.className = 'card st-' + it.status;
+      updateOverdueBadge(card, it);
+
+      if(it.status === 'FINALIZADO'){
+        it.andamento = 1;
+        slider.value = 100;
+        fill.style.width = '100%';
+        fill.style.background = progressGradient(100);
+        pctLabel.textContent = '100%';
+      }
+
+      renderGauges();
+      populateFilterOptions();
+      await persist();
+    });
+
+    slider.addEventListener('input', (e)=>{
+      const v = e.target.value;
+      fill.style.width = v + '%';
+      fill.style.background = progressGradient(Number(v));
+      pctLabel.textContent = v + '%';
+    });
+    slider.addEventListener('change', async (e)=>{
+      it.andamento = Number(e.target.value)/100;
+      renderGauges();
+      await persist();
+    });
+
+    const addBtn = card.querySelector('.plano-add button');
+    const addTxt = card.querySelector('.plano-add textarea');
+    addBtn.addEventListener('click', async ()=>{
+      const val = addTxt.value.trim();
+      if(!val) return;
+      const today = new Date();
+      const dstr = String(today.getDate()).padStart(2,'0')+'/'+String(today.getMonth()+1).padStart(2,'0');
+      it.planoLog = it.planoLog || [];
+      it.planoLog.push(`${dstr} — ${val}`);
+      addTxt.value = '';
+      renderCards();
+      await persist();
+    });
+    addTxt.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)){ addBtn.click(); }
+    });
+
+    card.querySelectorAll('.del-entry').forEach(delBtn=>{
+      delBtn.addEventListener('click', async (e)=>{
+        const idx = Number(e.target.dataset.idx);
+        it.planoLog.splice(idx,1);
+        renderCards();
+        await persist();
+      });
+    });
   });
 }
 
-selectEl.addEventListener('change', render);
-render();
+function updateOverdueBadge(card, it){
+  const prazoEl = card.querySelector('.prazo');
+  if(!prazoEl) return;
+  const overdue = isOverdue(it.prazo, it.status);
+  prazoEl.classList.toggle('overdue', overdue);
+}
 
-// ícone "i" de descrição: clique abre/fecha o balão; clique fora fecha tudo
-document.addEventListener('click', (e) => {
-  const icon = e.target.closest('.mb-info-icon');
-  document.querySelectorAll('.mb-info-icon.open').forEach(el => {
-    if (el !== icon) el.classList.remove('open');
+function cardTemplate(it){
+  const overdue = isOverdue(it.prazo, it.status);
+  const planoLog = it.planoLog || [];
+  return `
+  <div class="card st-${it.status}" data-id="${it.id}">
+    <div class="card-head">
+      <div class="title-block">
+        <div class="tags">
+          <span class="tag num">#${String(it.num).padStart(2,'0')}</span>
+          <span class="tag setor">${escapeHtml(it.setor||'—')}</span>
+          ${it.swot ? `<span class="tag swot-${escapeHtml(it.swot)}">${escapeHtml(it.swot)}</span>` : ''}
+          <span class="tag ano">${escapeHtml(String(it.ano||''))}</span>
+        </div>
+        ${it.melhoria ? `<p class="melhoria">${escapeHtml(it.melhoria)}</p>` : ''}
+        <p class="acao">${escapeHtml(it.acao || 'Sem título')}</p>
+      </div>
+      <div class="meta-right">
+        <div class="responsavel"><span class="avatar">${escapeHtml(initials(it.responsavel))}</span>${escapeHtml(it.responsavel||'—')}</div>
+        <div class="prazo ${overdue?'overdue':''}">${it.prazo ? (overdue?'⚠ atrasado desde ':'prazo: ')+fmtDate(it.prazo) : 'sem prazo definido'}</div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div>
+        <p class="field-lbl">Objetivo / Atividade</p>
+        <p class="field-txt ${!it.objetivo?'empty':''}">${escapeHtml(it.objetivo || 'não informado')}</p>
+      </div>
+      <div>
+        <p class="field-lbl">Local</p>
+        <p class="field-txt ${!it.local?'empty':''}">${escapeHtml(it.local || 'não informado')}</p>
+      </div>
+      ${it.descricao ? `<div style="grid-column:1/-1"><p class="field-lbl">Descrição</p><p class="field-txt">${escapeHtml(it.descricao)}</p></div>` : ''}
+    </div>
+
+    <div class="status-row">
+      <select class="status-select st-${it.status}">
+        ${STATUS_OPTIONS.map(s=>`<option value="${s}" ${s===it.status?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+
+    <div class="card-progress">
+      <div class="cp-head">
+        <span class="cp-lbl">Progresso da ação</span>
+        <span class="progress-pct">${Math.round((it.andamento||0)*100)}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${Math.round((it.andamento||0)*100)}%; background:${progressGradient(Math.round((it.andamento||0)*100))}"></div>
+        <input type="range" class="progress-slider" min="0" max="100" step="5" value="${Math.round((it.andamento||0)*100)}">
+      </div>
+    </div>
+
+    <div class="plano-block">
+      <p class="field-lbl">Plano · evolução registrada</p>
+      ${planoLog.length ? `<ul class="plano-log">${planoLog.map((l,idx)=>`<li>${escapeHtml(l)}<span class="del-entry" data-idx="${idx}" title="remover registro">✕</span></li>`).join('')}</ul>` : `<p class="plano-empty">Nenhuma atualização registrada ainda.</p>`}
+      <div class="plano-add">
+        <textarea placeholder="Adicionar nova atualização ao plano… (Ctrl/Cmd+Enter para salvar)"></textarea>
+        <button>Adicionar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function attachFilterListeners(){
+  ['fSearch','fSetor','fResp','fStatus','fSwot','fAno','fSort'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', renderCards);
+    el.addEventListener('change', renderCards);
   });
-  if (icon) {
-    icon.classList.toggle('open');
-    e.stopPropagation();
-  }
-});
-</script>
+  document.getElementById('fStatus').addEventListener('change', renderGauges);
+  document.getElementById('clearFilters').addEventListener('click', ()=>{
+    document.getElementById('fSearch').value = '';
+    ['fSetor','fResp','fStatus','fSwot','fAno'].forEach(id=>document.getElementById(id).value = '');
+    document.getElementById('fSort').value = 'prazo';
+    renderGauges();
+    renderCards();
+  });
+  document.getElementById('resetLink').addEventListener('click', async ()=>{
+    if(confirm('Isso vai apagar todas as edições feitas e restaurar os dados originais da planilha. Continuar?')){
+      items = JSON.parse(JSON.stringify(SEED_ITEMS));
+      await persist();
+      populateFilterOptions();
+      renderGauges();
+      renderCards();
+    }
+  });
+}
 
+async function init(){
+  setSyncBadge();
+  await loadItems();
+  populateFilterOptions();
+  renderGauges();
+  renderCards();
+  attachFilterListeners();
+  if(SYNC_ENABLED){
+    setInterval(refreshFromServer, AUTO_REFRESH_MS);
+  }
+}
+
+init();
+</script>
 </body>
 </html>
